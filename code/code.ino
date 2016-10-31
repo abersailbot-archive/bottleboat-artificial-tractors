@@ -11,25 +11,14 @@ void setup()
 // 7 most significant bits (with the high bit padded with 0)
 slaveAddress = HMC6352Address >> 1;   // This results in 0x21 as the address to pass to TWI
 Serial.begin(9600);
-pinMode(ledPin, OUTPUT);      // Set the LED pin as output
 Wire.begin();
 }
 void loop()
 {
-  // Flash the LED on pin 13 just to show that something is happening
-  // Also serves as an indication that we're not "stuck" waiting for TWI data
-  ledState = !ledState;
-  if (ledState) {
-    digitalWrite(ledPin,HIGH);
-  }
-  else
-  {
-    digitalWrite(ledPin,LOW);
-  }
   // Send a "A" command to the HMC6352
   // This requests the current heading data
   Wire.beginTransmission(slaveAddress);
-  Wire.send("A");              // The "Get Data" command
+  Wire.write("A");              // The "Get Data" command
   Wire.endTransmission();
   delay(10);                   // The HMC6352 needs at least a 70us (microsecond) delay
   // after this command.  Using 10ms just makes it safe
@@ -40,20 +29,25 @@ void loop()
   i = 0;
   while(Wire.available() && i < 2)
   { 
-    headingData[i] = Wire.receive();
+    headingData[i] = Wire.read();
     i++;
   }
-  headingValue = headingData[0]*256 + headingData[1];  // Put the MSB and LSB together
+  headingValue = headingData[0]*256 + headingData[1];  // Put the MSB and LSB together //headingValue comes out as 0 to 3600 
   Serial.print("Current heading: ");
-  Serial.print(int (headingValue / 10));     // The whole number part of the heading
-  Serial.print(".");
-  Serial.print(int (headingValue % 10));     // The fractional part of the heading
-  Serial.println(" degrees");
+ // Serial.print(int (headingValue / 10));     // The whole number part of the heading
+  //Serial.print(".");
+  //Serial.print(int (headingValue % 10));     // The fractional part of the heading
+  //Serial.println(" degrees");
+  Serial.println(headingValue);
   delay(500);
 } 
 //Calibrate compass for North. 
 
-//Input from compass
+//IMPORTANT NOTE A5 is Yellow wire, SCL
+//IMPORTANT NOTE A4 is green, SDA
+//Make sure wires for compass come out of pot up - greep bottle cap on bottom, red on top.
+
+//Input from compass (hmc6352)
 
 //Read input from compass on the arduino
     /* pseudocode 
@@ -67,19 +61,17 @@ void loop()
 GOTO PID 
      */
     
-//If compass is between 1 and 1800 degrees, rotate propeller direction
 
 //If at 0 degrees, no change in propeller direction
 
 
 
 
-}
 
 
-void loop() {
+
 
 
   
-}
+
 
