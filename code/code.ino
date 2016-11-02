@@ -1,18 +1,31 @@
 #include <Wire.h>
+#include <Servo.h>
+#def DESIRED_HEADING 1
+#def SERVO_PIN 9 //PLEASE CHANGE
 int HMC6352Address = 0x42;
 // This is calculated in the setup() function
 int slaveAddress;
 byte headingData[2];
 int i, headingValue;
+
+Servo rudderServo;
+
 void setup()
 {
 // Shift the device's documented slave address (0x42) 1 bit right
 // This compensates for how the TWI library only wants the
 // 7 most significant bits (with the high bit padded with 0)
 slaveAddress = HMC6352Address >> 1;   // This results in 0x21 as the address to pass to TWI
+//IMPORTANT NOTE A5 is Yellow wire, SCL
+//IMPORTANT NOTE A4 is green, SDA
+
+rudderServo.attach(SERVO_PIN);
+
 Serial.begin(9600);
 Wire.begin();
 }
+
+
 void loop()
 {
   // Send a "A" command to the HMC6352
@@ -40,27 +53,16 @@ void loop()
   //Serial.println(" degrees");
   Serial.println(headingValue);
   delay(500);
-} 
-//Calibrate compass for North. 
 
-//IMPORTANT NOTE A5 is Yellow wire, SCL
-//IMPORTANT NOTE A4 is green, SDA
-//Make sure wires for compass come out of pot up - greep bottle cap on bottom, red on top.
-
-//Input from compass (hmc6352)
-
-//Read input from compass on the arduino
-    /* pseudocode 
- PID:
- Error = Setpoint - Actual
- Integral = Integral + (Error*dt)
- Derivative = (Error - Previous_error)/dt
- Drive = (Error*kP) + (Integral*kI) + (Derivative*kD)
- Previous_error = Error
- wait(dt)
-GOTO PID 
-     */
-    
+//calibrate compass here
+ int kP = 1;
+ int error = (DESIRED_HEADING - headingValue) / 20; //This can now be sent to the servo (should be from 0 - 180)
+ int drive = (error*kP);
+ int rudderAngle = 
+ rudderServo.write(
+ int previousError = error;
+     
+}
 
 //If at 0 degrees, no change in propeller direction
 
