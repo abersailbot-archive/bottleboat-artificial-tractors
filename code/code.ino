@@ -1,9 +1,17 @@
+/*Pins:
+ * servo line - 5V
+ * compass live - 3.3V
+ * Compass SCL (yellow) A5
+ * Compass SDA (green) A4
+ * servo data (white) - digital 9
+ */
 #include <Wire.h>
 #include <Servo.h>
 
-#def DESIRED_HEADING 1
-#def SERVO_PIN 9 //PLEASE CHANGE
-#def COMPASS_OFFSET //difference between true north and boat north
+#define DESIRED_HEADING 1
+#define SERVO_PIN 9 //PLEASE CHANGE
+#define COMPASS_OFFSET //difference between true north and boat north       //something isn't working, but I can't work out what
+#define SERVO_STRAIGHT 101
 
 int HMC6352Address = 0x42;//NOTE A5 is Yellow wire, SCL; A4 is green, SDA
 int slaveAddress;
@@ -20,6 +28,8 @@ void setup() {
   rudderServo.attach(SERVO_PIN);
   Serial.begin(9600);
   Wire.begin();
+  analogWrite(5, 120);
+  
 }
 
 void loop() {
@@ -46,10 +56,14 @@ void loop() {
 
   //calibrate compass here
   int kP = 1;
-  int error = (DESIRED_HEADING - headingValue) / 20; //This can now be sent to the servo (should be from 0 - 180)
+  if (headingValue > 1800){
+    headingValue = 3600 - headingValue;
+  }
+  int error = (DESIRED_HEADING - headingValue) / 2; //This can now be sent to the servo (should be from 0 - 180)
   int drive = (error * kP);
   int rudderAngle;
-  rudderServo.write();
+  rudderServo.write(SERVO_STRAIGHT + drive);
   int previousError = error;
+  delay(100);
 
 }
